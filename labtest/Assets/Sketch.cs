@@ -4,6 +4,7 @@ using Pathfinding.Serialization.JsonFx; //make sure you include this using
 
 public class Sketch : MonoBehaviour {
     public GameObject myPrefab;
+	public GameObject cube;
     // Put your URL here
 	public string _WebsiteURL = "http://ccha504.azurewebsites.net/tables/WaterPollution?zumo-api-version=2.0.0";
 	public Material material1; 
@@ -20,6 +21,7 @@ public class Sketch : MonoBehaviour {
 	public Text x; 
 	public Text y; 
 	public Text z; 
+	public string jsonResponse ;
 
 
 
@@ -28,7 +30,7 @@ public class Sketch : MonoBehaviour {
         //Reguest.GET can be called passing in your ODATA url as a string in the form:
         //http://{Your Site Name}.azurewebsites.net/tables/{Your Table Name}?zumo-api-version=2.0.0
         //The response produce is a JSON string
-        string jsonResponse = Request.GET(_WebsiteURL);
+		jsonResponse = Request.GET(_WebsiteURL);
 
         //Just in case something went wrong with the request we check the reponse and exit if there is no response.
         if (string.IsNullOrEmpty(jsonResponse))
@@ -53,29 +55,64 @@ public class Sketch : MonoBehaviour {
 			GameObject newSphere = (GameObject)Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
 			newSphere.name = i.ToString();
 			newSphere.GetComponentInChildren<TextMesh>().text = "(" + reading.X + ", " + reading.Y + ", " + reading.Z + ")";
+
 			i++; 
         }
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		Debug.Log (sphereindex.ToString());
-		readingID.text = "ReadingID: " + data [sphereindex].ReadingID;
-		date.text  = "Date: " + data [sphereindex].WhenReadingRecorded;
-		location.text  = "location: " + data [sphereindex].Location;
-		categoty.text  = "Safety Category: " + data [sphereindex].SafetyCategory;
-		measure.text  = "Safety Measure: " + data [sphereindex].SafetyMeasure;
-		x.text  =  "X: " + data [sphereindex].X;
-		y.text  = "Y: " + data [sphereindex].Y;
-		z.text  = "Z: " + data [sphereindex].Z;
+//		Debug.Log (sphereindex.ToString());
+//		readingID.text = "ReadingID: " + data [sphereindex].ReadingID;
+//		date.text  = "Date: " + data [sphereindex].WhenReadingRecorded;
+//		location.text  = "location: " + data [sphereindex].Location;
+//		categoty.text  = "Safety Category: " + data [sphereindex].SafetyCategory;
+//		measure.text  = "Safety Measure: " + data [sphereindex].SafetyMeasure;
+//		x.text  =  "X: " + data [sphereindex].X;
+//		y.text  = "Y: " + data [sphereindex].Y;
+//		z.text  = "Z: " + data [sphereindex].Z;
+
 	
-	}
+			RaycastHit hitInfo = new RaycastHit();
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-//	void OnGUI() {
-//
-//	
-//	}
+			if (Input.GetMouseButtonDown(0))
+			{
+				if (Physics.Raycast(ray, out hitInfo))
+				{
+					if (hitInfo.collider.tag == "Sphere")
+					{
+						
+						hitInfo.collider.gameObject.GetComponent<Renderer>().material = material1;
+						int index = int.Parse(hitInfo.collider.gameObject.name);
+				
+						GameObject newPanel = (GameObject)Instantiate(cube, new Vector3(hitInfo.point.x, hitInfo.point.y + 1.0f, hitInfo.point.z), Quaternion.identity);
+					newPanel.GetComponentInChildren<TextMesh> ().text = "Location: " + data [index].Location
+					+ "\n" + "SafetyCategory: " + data [index].SafetyCategory
+					+ "\n" + "SafetyMeasure: " + data [index].SafetyMeasure;
+					}
+					if (hitInfo.collider.tag == "Cube")
+					{
+						Destroy(hitInfo.collider.gameObject);
+					}
+				}
+			}
 
+//			if (Input.GetMouseButtonDown(1))
+//			{
+//				if (Physics.Raycast(ray, out hitInfo))
+//				{
+//					
+//				}
+//			}
+
+		}
+
+
+
+
+
+		
 //
 //
 //	if (age <= 100 && age > 90 ){

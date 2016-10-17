@@ -9,7 +9,8 @@ public class myCubeScript : MonoBehaviour {
 
 
 	public Material material; 
-	public Material defaultmaterial; 
+	public Material defaultmaterial;
+
 
 
     // Use this for initialization
@@ -30,18 +31,6 @@ public class myCubeScript : MonoBehaviour {
 //        this.transform.RotateAround(Vector3.zero, Vector3.up, ratateSpeed);
 
 	}
-	void OnMouseDown() {
-//		this.ratateSpeed = 0.0f;
-//		spinSpeed = Vector3.zero; 
-		this.GetComponent<Renderer>().material = material;
-		Debug.Log (this.transform.name);
-		Sketch.sphereindex = int.Parse(this.transform.name);
-		//sketchholder.sphereindex = 
-	
-
-	}
-
-
 
 
 }

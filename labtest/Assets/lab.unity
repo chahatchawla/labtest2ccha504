@@ -850,6 +850,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myPrefab: {fileID: 1000011941113898, guid: 9110d49a24d8945d4b926ef48269cdb2, type: 2}
+  cube: {fileID: 1000011214946892, guid: 0fd9594315a874d9198f1de1f6106a0e, type: 2}
   _WebsiteURL: http://ccha504.azurewebsites.net/tables/WaterPollution?zumo-api-version=2.0.0
   material1: {fileID: 2100000, guid: 57c8f82b3d2524bfd9a66b219e12db0d, type: 2}
   material2: {fileID: 0}
@@ -863,6 +864,7 @@ MonoBehaviour:
   x: {fileID: 1906616712}
   y: {fileID: 803994906}
   z: {fileID: 2134815189}
+  jsonResponse: 
 --- !u!4 &993536276
 Transform:
   m_ObjectHideFlags: 0
@@ -1636,6 +1638,18 @@ Prefab:
       propertyPath: z
       value: 
       objectReference: {fileID: 2134815189}
+    - target: {fileID: 114000012755012058, guid: c03dcc25a196f499395a0fd369e9e8d0,
+        type: 2}
+      propertyPath: myPrefab
+      value: 
+      objectReference: {fileID: 1000011941113898, guid: 9110d49a24d8945d4b926ef48269cdb2,
+        type: 2}
+    - target: {fileID: 114000012755012058, guid: c03dcc25a196f499395a0fd369e9e8d0,
+        type: 2}
+      propertyPath: cube
+      value: 
+      objectReference: {fileID: 1000011214946892, guid: 0fd9594315a874d9198f1de1f6106a0e,
+        type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c03dcc25a196f499395a0fd369e9e8d0, type: 2}
   m_IsPrefabParent: 0
