@@ -6,12 +6,13 @@ public class Sketch : MonoBehaviour {
     public GameObject myPrefab;
 	public GameObject cube;
     // Put your URL here
-	public string _WebsiteURL = "http://ccha504.azurewebsites.net/tables/WaterPollution?zumo-api-version=2.0.0";
+	public string _WebsiteURL = "http://ccha504.azurewebsites.net/tables/TreeSurvey?zumo-api-version=2.0.0";
 	public Material material1; 
 	public Material material2; 
 	public Material material3; 
 	public Material material4; 
-	WaterPollution[] data;
+	public Material material5;
+	TreeSurvey[] data;
 	public static int sphereindex = 0; 
 	public Text readingID; 
 	public Text date; 
@@ -22,7 +23,6 @@ public class Sketch : MonoBehaviour {
 	public Text y; 
 	public Text z; 
 	public string jsonResponse ;
-
 
 
 
@@ -39,133 +39,75 @@ public class Sketch : MonoBehaviour {
         }
 
         //We can now deserialize into an array of objects - in this case the class we created. The deserializer is smart enough to instantiate all the classes and populate the variables based on column name.
-		data = JsonReader.Deserialize<WaterPollution[]>(jsonResponse);
+		data = JsonReader.Deserialize<TreeSurvey[]>(jsonResponse);
 		int i = 0;
 
-
         //We can now loop through the array of objects and access each object individually
-		foreach (WaterPollution reading in data)
+		foreach (TreeSurvey reading in data)
         {
-            //Example of how to use the object
-
+			//convert the string readings to floats - as the data given is in floats 
 			float x = float.Parse (reading.X);
 			float y = float.Parse (reading.Y);
 			float z = float.Parse (reading.Z);
 
+			//Plot the prefab "SphereWithText" on the3D space using the reading data  
 			GameObject newSphere = (GameObject)Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
 			newSphere.name = i.ToString();
-			newSphere.GetComponentInChildren<TextMesh>().text = "(" + reading.X + ", " + reading.Y + ", " + reading.Z + ")";
 
+			//Label on each point with their Ecological Value 
+			newSphere.GetComponentInChildren<TextMesh>().text = reading.EcologicalValue;
+
+			//Different physical (color) attribute depending on Ecological Value 
+			if (reading.EcologicalValue == "Very High") {
+				newSphere.GetComponent<Renderer> ().material = material2;
+			} else if (reading.EcologicalValue == "High") {
+				newSphere.GetComponent<Renderer> ().material = material3;
+			} else if (reading.EcologicalValue == "Medium") {
+				newSphere.GetComponent<Renderer> ().material = material4;
+			}else {
+				newSphere.GetComponent<Renderer> ().material = material5;
+			}
 			i++; 
         }
 	}
 	
 	// Update is called once per frame
 	void Update () {
-//		Debug.Log (sphereindex.ToString());
-//		readingID.text = "ReadingID: " + data [sphereindex].ReadingID;
-//		date.text  = "Date: " + data [sphereindex].WhenReadingRecorded;
-//		location.text  = "location: " + data [sphereindex].Location;
-//		categoty.text  = "Safety Category: " + data [sphereindex].SafetyCategory;
-//		measure.text  = "Safety Measure: " + data [sphereindex].SafetyMeasure;
-//		x.text  =  "X: " + data [sphereindex].X;
-//		y.text  = "Y: " + data [sphereindex].Y;
-//		z.text  = "Z: " + data [sphereindex].Z;
 
-	
-			RaycastHit hitInfo = new RaycastHit();
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-			if (Input.GetMouseButtonDown(0))
-			{
-				if (Physics.Raycast(ray, out hitInfo))
-				{
-					if (hitInfo.collider.tag == "Sphere")
-					{
-						
-						hitInfo.collider.gameObject.GetComponent<Renderer>().material = material1;
-						int index = int.Parse(hitInfo.collider.gameObject.name);
-				
-						GameObject newPanel = (GameObject)Instantiate(cube, new Vector3(hitInfo.point.x, hitInfo.point.y + 1.0f, hitInfo.point.z), Quaternion.identity);
+		//Get Mouse position
+		RaycastHit hitInfo = new RaycastHit ();
+		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+
+		//If left mouse button clicked 
+		if (Input.GetMouseButtonDown (0)) {
+			if (Physics.Raycast (ray, out hitInfo)) {
+
+				//If the object selected was a sphere 
+				if (hitInfo.collider.tag == "Sphere") {
+
+					//Change its color to blue 
+					hitInfo.collider.gameObject.GetComponent<Renderer> ().material = material1;
+
+					//Get index of sphere object in the tree survey data 
+					int index = int.Parse (hitInfo.collider.gameObject.name);
+
+					//Create a new panel that shows the point data 
+					GameObject newPanel = (GameObject)Instantiate (cube, 
+						                      new Vector3 (hitInfo.point.x, hitInfo.point.y + 1.0f, hitInfo.point.z), Quaternion.identity);
 					newPanel.GetComponentInChildren<TextMesh> ().text = "Location: " + data [index].Location
-					+ "\n" + "SafetyCategory: " + data [index].SafetyCategory
-					+ "\n" + "SafetyMeasure: " + data [index].SafetyMeasure;
-					}
-					if (hitInfo.collider.tag == "Cube")
-					{
-						Destroy(hitInfo.collider.gameObject);
-					}
+					+ "\n" + "Ecological Value: " + data [index].EcologicalValue
+					+ "\n" + "Historical Significance: " + data [index].HistoricalSignificance
+					+ "\n" + "Date: " + data [index].WhenReadingRecorded;
+				}
+					
+				//If the object selected was a cube/panel 
+				if (hitInfo.collider.tag == "Cube") {
+					//Destroy the panel 
+					Destroy (hitInfo.collider.gameObject);
 				}
 			}
-
-//			if (Input.GetMouseButtonDown(1))
-//			{
-//				if (Physics.Raycast(ray, out hitInfo))
-//				{
-//					
-//				}
-//			}
-
 		}
+	}
 
-
-
-
-
-		
-//
-//
-//	if (age <= 100 && age > 90 ){
-//		Debug.Log("This age at death is: " + int.Parse(cenotaph.Ageatdeath));
-//		float y = 9.0f;
-//		float z = 0.0f;
-//		GameObject newCube = (GameObject)Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
-//		newCube.GetComponent<myCubeScript>().setSize((1.0f - perc) * 2);
-//		newCube.GetComponent<myCubeScript>().ratateSpeed = perc;
-//		newCube.GetComponentInChildren<TextMesh>().text = cenotaph.Ageatdeath;
-//		newCube.GetComponent<Renderer> ().material = material1;
-//
-//	}else if (age <= 90 && age > 85 ){
-//		Debug.Log("This age at death is: " + int.Parse(cenotaph.Ageatdeath));
-//		float y = 7.0f;
-//		float z = 0.0f;
-//		GameObject newCube = (GameObject)Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
-//		newCube.GetComponent<myCubeScript>().setSize((1.0f - perc) * 2);
-//		newCube.GetComponent<myCubeScript>().ratateSpeed = perc;
-//		newCube.GetComponentInChildren<TextMesh>().text = cenotaph.Ageatdeath;
-//		newCube.GetComponent<Renderer> ().material = material2;
-//	}
-//	else if (age <= 85 && age > 80 ){
-//		Debug.Log("This age at death is: " + int.Parse(cenotaph.Ageatdeath));
-//		float y = 4.0f;
-//		float z = 0.0f;
-//		GameObject newCube = (GameObject)Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
-//		newCube.GetComponent<myCubeScript>().setSize((1.0f - perc) * 2);
-//		newCube.GetComponent<myCubeScript>().ratateSpeed = perc;
-//		newCube.GetComponentInChildren<TextMesh>().text = cenotaph.Ageatdeath;
-//		newCube.GetComponent<Renderer> ().material = material3;
-//
-//	}
-//	else{
-//		Debug.Log("This age at death is: " + int.Parse(cenotaph.Ageatdeath));
-//		float y = 1.0f;
-//		float z = 0.0f;
-//		GameObject newCube = (GameObject)Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
-//		newCube.GetComponent<myCubeScript>().setSize((1.0f - perc) * 2);
-//		newCube.GetComponent<myCubeScript>().ratateSpeed = perc;
-//		newCube.GetComponentInChildren<TextMesh>().text = cenotaph.Ageatdeath;
-//		newCube.GetComponent<Renderer> ().material = material4;
-//
-//	}
-
-
-
-//	GUI.Label (new Rect (10, 20, 300, 40), "ReadingID: " + data [sphereindex].ReadingID);
-//	GUI.Label (new Rect (10, 40, 300, 40), "Date: " + data [sphereindex].WhenReadingRecorded);
-//	GUI.Label (new Rect (10, 60, 300, 40), "Label: " + data [sphereindex].Location);
-//	GUI.Label (new Rect (10, 80, 300, 40), "Safety Category: " + data [sphereindex].SafetyCategory);
-//	GUI.Label (new Rect (10, 100, 300, 40), "Safety Measure: " + data [sphereindex].SafetyMeasure);
-//	GUI.Label (new Rect (10, 120, 300, 40), "X: " + data [sphereindex].X);
-//	GUI.Label (new Rect (10, 140, 300, 40), "Y: " + data [sphereindex].Y);
-//	GUI.Label (new Rect (10, 160, 300, 40), "Z: " + data [sphereindex].Z);
 }
